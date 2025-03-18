@@ -1,37 +1,43 @@
 import axios from "axios";
-import React, { useState } from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-const AddPosts = ({ getPosts }) => {
+export const AddPosts = () => {
   const [text, setText] = useState("");
+  const token = localStorage.getItem("token");
+  const navigate = useNavigate();
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    const token = localStorage.getItem("token");
-    axios
-      .post(
-        `https://nt-devconnector.onrender.com/api/posts`,
+    try {
+      await axios.post(
+        "https://nt-devconnector.onrender.com/api/posts",
         { text },
         {
           headers: {
             "x-auth-token": token,
           },
         }
-      )
-      .then(() => getPosts());
-    setText("");
+      );
+      navigate("/"); // Home sahifasiga qaytish
+    } catch (error) {
+      console.error("Post qo‘shishda xatolik:", error);
+    }
   }
-  return (
-    <div>
-      <h2>AddPosts</h2>
 
-      <form action="" onSubmit={handleSubmit}>
-        <input
-          type="text"
+  return (
+    <div className="w-[400px] mx-auto">
+      <h2>Yangi post qo‘shish</h2>
+      <form onSubmit={handleSubmit}>
+        <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
+          className="w-full p-2 border"
+          placeholder="Post matnini kiriting"
         />
-
-        <button>yuborish</button>
+        <button type="submit" className="bg-blue-500 text-white p-2 mt-2">
+          Add Post
+        </button>
       </form>
     </div>
   );
